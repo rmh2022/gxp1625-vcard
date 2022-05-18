@@ -1,0 +1,5 @@
+<?php
+
+$vcard_dir = 'fill_me';
+
+?>
