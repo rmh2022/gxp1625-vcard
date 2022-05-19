@@ -49,28 +49,29 @@ foreach(scandir($vcard_dir) as $file)
                 foreach($vcard->phone as $key => $value)
                     {
                         // TYPE field may be stored in upper-case
-                        switch(strtolower($key))
+                        $lkey = strtolower($key);
+
+                        $pref = preg_match(',pref$', $lkey);
+
+                        switch(preg_replace('/,pref$/', '', $lkey))
                             {
                             case 'work':
-                                gen_phone_entry('Work', $value[0], false);
+                                gen_phone_entry('Work', $value[0], $pref);
                                 break;
-                            case 'work,pref':
-                                gen_phone_entry('Work', $value[0], true);
-                                break;
-
                             case 'home':
-                                gen_phone_entry('Home', $value[0], false);
+                                gen_phone_entry('Home', $value[0], $pref);
                                 break;
-                            case 'home,pref':
-                                gen_phone_entry('Home', $value[0], true);
+                            case 'cell':
+                            case 'x-mobile':    // en
+                            case 'x-mòbil':     // ca
+                            case 'x-móvil':     // es
+                                gen_phone_entry('Cell', $value[0], $pref);
                                 break;
 
-                            case 'cell':
-                                gen_phone_entry('Cell', $value[0], false);
-                                break;
-                            case 'cell,pref':
-                                gen_phone_entry('Cell', $value[0], true);
-                                break;
+                            case 'default':     // Android lists this as "Other"
+                            default:
+                                // Not ideal, but still better than silently skipping it.
+                                gen_phone_entry('Cell', $value[0], $pref);
                             }
                     }
                 
