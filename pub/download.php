@@ -45,22 +45,33 @@ foreach(scandir($vcard_dir) as $file)
                 if (strlen($vcard->lastname ?? '') > 0)
                     echo '<LastName>'.escape_for_xml($vcard->lastname).'</LastName>';
 
-                // A single entry is allowed for each phone type, so we pick the first one.
+                foreach($vcard->phone as $key => $value)
+                    {
+                        // TYPE field may be stored in upper-case
+                        switch(strtolower($key))
+                            {
+                            case 'work':
+                                gen_phone_entry('Work', $value[0], false);
+                                break;
+                            case 'work,pref':
+                                gen_phone_entry('Work', $value[0], true);
+                                break;
 
-                if (count($vcard->phone['work']) > 0)
-                    gen_phone_entry('Work', $vcard->phone['work'][0], false);
-                if (count($vcard->phone['work,pref']) > 0)
-                    gen_phone_entry('Work', $vcard->phone['work,pref'][0], true);
+                            case 'home':
+                                gen_phone_entry('Home', $value[0], false);
+                                break;
+                            case 'home,pref':
+                                gen_phone_entry('Home', $value[0], true);
+                                break;
 
-                if (count($vcard->phone['home']) > 0)
-                    gen_phone_entry('Home', $vcard->phone['home'][0], false);
-                if (count($vcard->phone['home,pref']) > 0)
-                    gen_phone_entry('Home', $vcard->phone['home,pref'][0], true);
-
-                if (count($vcard->phone['cell']) > 0)
-                    gen_phone_entry('Cell', $vcard->phone['cell'][0], false);
-                if (count($vcard->phone['cell,pref']) > 0)
-                    gen_phone_entry('Cell', $vcard->phone['cell,pref'][0], true);
+                            case 'cell':
+                                gen_phone_entry('Cell', $value[0], false);
+                                break;
+                            case 'cell,pref':
+                                gen_phone_entry('Cell', $value[0], true);
+                                break;
+                            }
+                    }
                 
                 echo '<Frequent>0</Frequent>';
                 echo '<Primary>0</Primary>';
