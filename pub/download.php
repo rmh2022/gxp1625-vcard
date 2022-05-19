@@ -12,7 +12,8 @@ function escape_for_xml($str)
 
 function sanitize_phone_number($str)
 {
-    return preg_replace('/[^\+0-9]/', '', $str);
+    // Only DTMF digits are allowed
+    return preg_replace('/[^\+\*#0-9]/', '', $str);
 }
 
 function gen_phone_entry($type, $unsanitized_phone_str, $preferred = false)
