@@ -20,6 +20,8 @@ In Grandstream GXP1625 administrative interface, access Contacts > Phonebook Man
 
 Implements no authentication. This can be done in the HTTP layer (e.g. AuthUserFile in Apache).
 
+Only the following phone number types are converted: Home, Work, Mobile (other types are ignored)
+
 If a given contact has more than one phone number of the same type (e.g. two work phones), only the first one is exported.
 
 In a typical setup your www-data can't access the *.vcf files managed by your CardDAV server, as is the case with Radicale. A simple workaround is to setup a cronjob that regularly syncs them into another directory while reseting their permissions. Example for Radicale:
