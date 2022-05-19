@@ -15,6 +15,16 @@ function sanitize_phone_number($str)
     return preg_replace('/[^\+0-9]/', '', $str);
 }
 
+function gen_phone_entry($type, $unsanitized_phone_str, $preferred = false)
+{
+    // $preferred means the phone number has been defined as default for this contact, but AFAIK there's
+    // no way to represent this in the GXP1625 XML.
+    echo '<Phone type="'.$type.'">';
+    echo '<phonenumber>'.escape_for_xml(sanitize_phone_number($unsanitized_phone_str)).'</phonenumber>';
+    echo '<accountindex>1</accountindex>';
+    echo '</Phone>';
+}
+
 header('Content-Type: application/xml');
 
 echo '<?xml version="1.0" encoding="UTF-8"?>';
@@ -38,28 +48,19 @@ foreach(scandir($vcard_dir) as $file)
                 // A single entry is allowed for each phone type, so we pick the first one.
 
                 if (count($vcard->phone['work']) > 0)
-                    {
-                        echo '<Phone type="Work">';
-                        echo '<phonenumber>'.escape_for_xml(sanitize_phone_number($vcard->phone['work'][0])).'</phonenumber>';
-                        echo '<accountindex>1</accountindex>';
-                        echo '</Phone>';
-                    }
+                    gen_phone_entry('Work', $vcard->phone['work'][0], false);
+                if (count($vcard->phone['work,pref']) > 0)
+                    gen_phone_entry('Work', $vcard->phone['work,pref'][0], true);
 
                 if (count($vcard->phone['home']) > 0)
-                    {
-                        echo '<Phone type="Home">';
-                        echo '<phonenumber>'.escape_for_xml(sanitize_phone_number($vcard->phone['home'][0])).'</phonenumber>';
-                        echo '<accountindex>1</accountindex>';
-                        echo '</Phone>';
-                    }
+                    gen_phone_entry('Home', $vcard->phone['home'][0], false);
+                if (count($vcard->phone['home,pref']) > 0)
+                    gen_phone_entry('Home', $vcard->phone['home,pref'][0], true);
 
                 if (count($vcard->phone['cell']) > 0)
-                    {
-                        echo '<Phone type="Cell">';
-                        echo '<phonenumber>'.escape_for_xml(sanitize_phone_number($vcard->phone['cell'][0])).'</phonenumber>';
-                        echo '<accountindex>1</accountindex>';
-                        echo '</Phone>';
-                    }
+                    gen_phone_entry('Cell', $vcard->phone['cell'][0], false);
+                if (count($vcard->phone['cell,pref']) > 0)
+                    gen_phone_entry('Cell', $vcard->phone['cell,pref'][0], true);
                 
                 echo '<Frequent>0</Frequent>';
                 echo '<Primary>0</Primary>';
