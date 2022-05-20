@@ -20,16 +20,19 @@ function gen_phone_entry($type, $unsanitized_phone_str, $preferred = false)
 {
     // $preferred means the phone number has been defined as default for this contact, but AFAIK there's
     // no way to represent this in the GXP1625 XML.
-    echo '<Phone type="'.$type.'">';
-    echo '<phonenumber>'.escape_for_xml(sanitize_phone_number($unsanitized_phone_str)).'</phonenumber>';
-    echo '<accountindex>1</accountindex>';
-    echo '</Phone>';
+    echo '<Phone type="'.$type.'">'."\n";
+    echo '<phonenumber>'.escape_for_xml(sanitize_phone_number($unsanitized_phone_str)).'</phonenumber>'."\n";
+    echo '<accountindex>1</accountindex>'."\n";
+    echo '</Phone>'."\n";
 }
 
 header('Content-Type: application/xml');
 
-echo '<?xml version="1.0" encoding="UTF-8"?>';
-echo '<AddressBook>';
+// Newlines MUST be included, otherwise the entire file may be ignored by the GXP1625. This doesn't always
+// happen (I suspect it may be related to size of the file and/or size of specific tags).
+
+echo '<?xml version="1.0" encoding="UTF-8"?>'."\n";
+echo '<AddressBook>'."\n";
 
 $contact_id = 1;
 
@@ -40,11 +43,11 @@ foreach(scandir($vcard_dir) as $file)
 
         foreach(VCardParser::parseFromFile($vcard_dir.'/'.$file) as $vcard)
             {
-                echo '<Contact>';
-                echo '<id>'.$contact_id++.'</id>';
-                echo '<FirstName>'.escape_for_xml($vcard->firstname).'</FirstName>';
+                echo '<Contact>'."\n";
+                echo '<id>'.$contact_id++.'</id>'."\n";
+                echo '<FirstName>'.escape_for_xml($vcard->firstname).'</FirstName>'."\n";
                 if (strlen($vcard->lastname ?? '') > 0)
-                    echo '<LastName>'.escape_for_xml($vcard->lastname).'</LastName>';
+                    echo '<LastName>'.escape_for_xml($vcard->lastname).'</LastName>'."\n";
 
                 foreach($vcard->phone as $key => $value)
                     {
@@ -75,11 +78,11 @@ foreach(scandir($vcard_dir) as $file)
                             }
                     }
                 
-                echo '<Frequent>0</Frequent>';
-                echo '<Primary>0</Primary>';
-                echo '</Contact>';
+                echo '<Frequent>0</Frequent>'."\n";
+                echo '<Primary>0</Primary>'."\n";
+                echo '</Contact>'."\n";
             }
     }
 
-echo '</AddressBook>';
+echo '</AddressBook>'."\n";
 ?>
