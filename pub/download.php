@@ -51,7 +51,7 @@ foreach(scandir($vcard_dir) as $file)
                         // TYPE field may be stored in upper-case
                         $lkey = strtolower($key);
 
-                        $pref = preg_match(',pref$', $lkey);
+                        $pref = preg_match('/,pref$/', $lkey);
 
                         switch(preg_replace('/,pref$/', '', $lkey))
                             {
