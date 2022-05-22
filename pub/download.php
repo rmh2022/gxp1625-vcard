@@ -43,11 +43,31 @@ foreach(scandir($vcard_dir) as $file)
 
         foreach(VCardParser::parseFromFile($vcard_dir.'/'.$file) as $vcard)
             {
+                // It would be pointless to produce a phonebook entry with no phone numbers.
+                if (! isset($vcard->phone))
+                    continue;
+
+                if (isset($vcard->firstname))
+                    {
+                        $firstname = $vcard->firstname;
+                        if (isset($vcard->lastname))
+                            $lastname = $vcard->lastname;
+                    }
+                else if (isset($vcard->fullname))
+                    {
+                        // Not ideal, but still better than the alternative (see below)
+                        $firstname = $vcard->fullname;
+                    }
+                else
+                    // Skip this contact, rather than producing a nameless phonebook entry
+                    continue;
+
                 echo '<Contact>'."\n";
                 echo '<id>'.$contact_id++.'</id>'."\n";
-                echo '<FirstName>'.escape_for_xml($vcard->firstname).'</FirstName>'."\n";
-                if (strlen($vcard->lastname ?? '') > 0)
-                    echo '<LastName>'.escape_for_xml($vcard->lastname).'</LastName>'."\n";
+
+                echo '<FirstName>'.escape_for_xml($firstname).'</FirstName>'."\n";
+                if (isset($lastname))
+                    echo '<LastName>'.escape_for_xml($lastname).'</LastName>'."\n";
 
                 foreach($vcard->phone as $key => $value)
                     {
